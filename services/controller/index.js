@@ -6,9 +6,27 @@ const cors = require('cors');
 const app = express();
 app.use(cors());
 
+app.get('/product/:id', (req, res, next) => {
+    // Chama método do microsserviço.
+    inventory.SearchProductByID({ id: req.params.id }, (err, product) => {
+        // Se ocorrer algum erro de comunicação
+        // com o microsserviço, retorna para o navegador.
+        if (err) {
+            console.error(err);
+            res.status(500).send({ error: 'something failed :(' });
+        } else {
+            // Caso contrário, retorna resultado do
+            // microsserviço (um arquivo JSON) com os dados
+            // do produto pesquisado
+            res.json(product);
+        }
+    });
+});
+
 /**
  * Retorna a lista de produtos da loja via InventoryService
  */
+
 app.get('/products', (req, res, next) => {
     inventory.SearchAllProducts(null, (err, data) => {
         if (err) {
